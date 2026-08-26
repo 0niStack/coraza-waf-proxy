@@ -1,6 +1,6 @@
 services:
   waf:
-    build: ./caddy
+    image: ghcr.io/0nistack/caddy-waf:latest
     container_name: waf
     ports:
       - "80:80"
