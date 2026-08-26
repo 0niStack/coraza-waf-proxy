@@ -1,0 +1,16 @@
+services:
+  waf:
+    build: ./caddy
+    container_name: waf
+    ports:
+      - "80:80"
+    environment:
+      # Where the WAF sends clean traffic. Override in .env — examples:
+      #   UPSTREAM=my-app:5000                    (a container on this compose network)
+      #   UPSTREAM=host.docker.internal:3000       (an app running directly on the VM host)
+      #   UPSTREAM=192.168.1.50:8080                (any other host/IP reachable from this box)
+      - UPSTREAM=${UPSTREAM:-host.docker.internal:5000}
+    extra_hosts:
+      # Lets host.docker.internal resolve to the VM host from inside the container (works on Linux too).
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

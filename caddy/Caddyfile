@@ -1,0 +1,29 @@
+{
+	# The WAF handler must run before anything else in the chain.
+	order coraza_waf first
+	admin off
+}
+
+:80 {
+	coraza_waf {
+		# Pull in the OWASP Core Rule Set that ships bundled with the plugin.
+		load_owasp_crs
+
+		directives `
+			Include @coraza.conf-recommended
+			Include @crs-setup.conf.example
+			Include @owasp_crs/*.conf
+			SecRuleEngine On
+		`
+	}
+
+	# Where clean traffic is forwarded. Set via the UPSTREAM env var
+	# (see docker-compose.yml / .env) — this is what makes the target dynamic.
+	# Falls back to localhost:5000 if UPSTREAM isn't set.
+	reverse_proxy {$UPSTREAM:localhost:5000}
+
+	log {
+		output stdout
+		format console
+	}
+}
